@@ -340,8 +340,7 @@ void LaserMapping::Run() {
         if (path_save_en_) {
             PublishPath(pub_path_);
         }
-        Eigen::Vector3f lidar_pos(pos_lidar_[0], pos_lidar_[1], pos_lidar_[2]);
-        cylinder_fitter_->addPointCloud(scan_down_world_, ros::Time().fromSec(lidar_end_time_), lidar_pos);
+        PublishTrunk(pub_trunk_); 
     } else {
         if (pub_odom_aft_mapped_) {
             PublishOdometry(pub_odom_aft_mapped_);
@@ -808,59 +807,60 @@ void LaserMapping::PublishTrunk(const ros::Publisher &pub_trunk) {
     //     laserCloudWorld = scan_down_world_;
     // }
 
-    visualization_msgs::MarkerArray marker_array;
     Eigen::Vector3f lidar_pos(pos_lidar_[0], pos_lidar_[1], pos_lidar_[2]);
     // cylinder_fitter_->addPointCloud(laserCloudWorld, ros::Time().fromSec(lidar_end_time_), lidar_pos);
     cylinder_fitter_->addPointCloud(scan_down_world_, ros::Time().fromSec(lidar_end_time_), lidar_pos);
-    std::vector<TrunkCylinderDesc> cylinders = cylinder_fitter_->getAllTrunkCylinderDesc();
 
-    for (auto& cylinder : cylinders) {
-        visualization_msgs::Marker marker;
-        marker.header.frame_id = "camera_init";
-        marker.header.stamp = ros::Time().fromSec(lidar_end_time_);
-        
-        marker.ns = "trunk_cylinder";
-        marker.id = cylinder.trunk_id;
+    if (run_in_offline_ == false) {
+        std::vector<TrunkCylinderDesc> cylinders = cylinder_fitter_->getAllTrunkCylinderDesc();
 
-        marker.type = visualization_msgs::Marker::CYLINDER;
-        marker.action = visualization_msgs::Marker::ADD;
-        
-        marker.pose.position.x = cylinder.position.x();
-        marker.pose.position.y = cylinder.position.y();
-        marker.pose.position.z = cylinder.position.z();
-        
-        Eigen::Quaternionf orientation;
-        orientation.setFromTwoVectors(Eigen::Vector3f(0, 0, 1), cylinder.direction);
-        marker.pose.orientation.x = orientation.x();
-        marker.pose.orientation.y = orientation.y();
-        marker.pose.orientation.z = orientation.z();
-        marker.pose.orientation.w = orientation.w();
-        
-        marker.scale.x = cylinder.radius * 2.0;  // diameter
-        marker.scale.y = cylinder.radius * 2.0;
-        marker.scale.z = cylinder.height;
-        
-        uint32_t seed = static_cast<uint32_t>(marker.id);
-        srand(seed);
-        std_msgs::ColorRGBA color;
-        color.r = static_cast<float>(rand() % 256) / 255.0f;
-        color.g = static_cast<float>(rand() % 256) / 255.0f;
-        color.b = static_cast<float>(rand() % 256) / 255.0f;
-        marker.color = color;
-        // marker.color.r = 0.0f;
-        // marker.color.g = 1.0f;
-        // marker.color.b = 0.0f;
-        marker.color.a = 0.9f;
-        marker.lifetime = ros::Duration(0);
+        visualization_msgs::MarkerArray marker_array;
+        for (auto& cylinder : cylinders) {
+            visualization_msgs::Marker marker;
+            marker.header.frame_id = "camera_init";
+            marker.header.stamp = ros::Time().fromSec(lidar_end_time_);
+            marker.ns = "trunk_cylinder";
+            marker.id = cylinder.trunk_id;
+            marker.type = visualization_msgs::Marker::CYLINDER;
+            marker.action = visualization_msgs::Marker::ADD;
+            
+            marker.pose.position.x = cylinder.position.x();
+            marker.pose.position.y = cylinder.position.y();
+            marker.pose.position.z = cylinder.position.z();
+            
+            Eigen::Quaternionf orientation;
+            orientation.setFromTwoVectors(Eigen::Vector3f(0, 0, 1), cylinder.direction);
+            marker.pose.orientation.x = orientation.x();
+            marker.pose.orientation.y = orientation.y();
+            marker.pose.orientation.z = orientation.z();
+            marker.pose.orientation.w = orientation.w();
+            
+            marker.scale.x = cylinder.radius * 2.0;  // diameter
+            marker.scale.y = cylinder.radius * 2.0;
+            marker.scale.z = cylinder.height;
+            
+            uint32_t seed = static_cast<uint32_t>(marker.id);
+            srand(seed);
+            std_msgs::ColorRGBA color;
+            color.r = static_cast<float>(rand() % 256) / 255.0f;
+            color.g = static_cast<float>(rand() % 256) / 255.0f;
+            color.b = static_cast<float>(rand() % 256) / 255.0f;
+            marker.color = color;
+            // marker.color.r = 0.0f;
+            // marker.color.g = 1.0f;
+            // marker.color.b = 0.0f;
+            marker.color.a = 0.9f;
+            marker.lifetime = ros::Duration(0);
 
-        marker_array.markers.push_back(marker);
+            marker_array.markers.push_back(marker);
+        }
+        pub_trunk.publish(marker_array);
     }
-    pub_trunk.publish(marker_array);
 }
 
 void LaserMapping::Savetrunk(const std::string &trunk_file) {
     std::ofstream ofs;
-    ofs.open(trunk_file, std::ios::out);
+    ofs.open(trunk_file, std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         LOG(ERROR) << "Failed to open trunk_file: " << trunk_file;
         return;
@@ -880,7 +880,7 @@ void LaserMapping::Savetrunk(const std::string &trunk_file) {
 
 void LaserMapping::Savetrajectory(const std::string &traj_file) {
     std::ofstream ofs;
-    ofs.open(traj_file, std::ios::out);
+    ofs.open(traj_file, std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         LOG(ERROR) << "Failed to open traj_file: " << traj_file;
         return;

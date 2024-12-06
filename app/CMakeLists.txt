@@ -7,6 +7,11 @@ target_link_libraries(run_mapping_offline
         ${PROJECT_NAME} gflags
         )
 
+add_executable(run_mapping_newbag run_mapping_newbag.cc)
+target_link_libraries(run_mapping_newbag
+        ${PROJECT_NAME}
+        )
+
 # 查找 PCL 和 VTK 包
 find_package(X11 REQUIRED)
 

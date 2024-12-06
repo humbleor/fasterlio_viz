@@ -14,14 +14,18 @@
 	<param name="runtime_pos_log_enable" type="bool" value="0" />
     <node pkg="faster_lio" type="run_mapping_online" name="laserMapping" output="screen" />
 
-	<!-- <arg name="bag_file" value="/home/mspace/data/102-50-1.bag"/>
-	播放 bag 文件中的话题
-    <node pkg="rosbag" type="play" name="rosbag_play" args="$(arg bag_file)">
+	<arg name="play_bag_file" value="/home/mspace/data/102-50-2.bag"/>
+	<!-- 播放 bag 文件中的话题 -->
+    <node pkg="rosbag" type="play" name="rosbag_play" args="$(arg play_bag_file)">
         <param name="rate" value="1.0"/>
-    </node> -->
-	
+    </node>
+
+	<!-- 使用 rosbag record 录制话题 -->
+	<arg name="recorded_bag_file" value="/home/mspace/data/recorded_.bag"/>
+    <node pkg="rosbag" type="record" name="rosbag_record" required="true" output="screen" 
+	args="-O $(arg recorded_bag_file) /tf /tf_static /cloud_registered /path /trunk_array /camera/color/image_raw/compressed" />
+
 	<!-- <group if="$(arg rviz)">
     <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz_fasterlio" args="-d $(find faster_lio)/rviz_cfg/loam_livox.rviz" />
     </group> -->
-
 </launch>

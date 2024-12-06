@@ -9,11 +9,11 @@
 
 /// run faster-LIO in offline mode
 
-DEFINE_string(config_file, std::string(ROOT_DIR) + "/config/avia.yaml", "path to config file");
+DEFINE_string(config_file, std::string(ROOT_DIR) + "config/avia.yaml", "path to config file");
 DEFINE_string(bag_file, "/home/mspace/data/102.bag", "path to the ros bag");
-DEFINE_string(time_log_file, std::string(ROOT_DIR) + "/Log/time.log", "path to time log file");
-DEFINE_string(traj_log_file, std::string(ROOT_DIR) + "/Log/traj.txt", "path to traj log file");
-DEFINE_string(trunk_log_file, std::string(ROOT_DIR) + "/Log/trunk.txt", "path to trunk log file");
+DEFINE_string(time_log_file, std::string(ROOT_DIR) + "Log/time.log", "path to time log file");
+DEFINE_string(traj_log_file, std::string(ROOT_DIR) + "Log/traj.txt", "path to traj log file");
+DEFINE_string(trunk_log_file, std::string(ROOT_DIR) + "Log/trunk.txt", "path to trunk log file");
 
 void SigHandle(int sig) {
     faster_lio::options::FLAG_EXIT = true;

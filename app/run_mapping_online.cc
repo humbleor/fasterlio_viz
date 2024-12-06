@@ -9,8 +9,8 @@
 
 /// run the lidar mapping in online mode
 
-DEFINE_string(traj_log_file, std::string(ROOT_DIR) + "/Log/traj.txt", "path to traj log file");
-DEFINE_string(trunk_log_file, std::string(ROOT_DIR) + "/Log/trunk.txt", "path to trunk log file");
+DEFINE_string(traj_log_file, std::string(ROOT_DIR) + "Log/traj.txt", "path to traj log file");
+DEFINE_string(trunk_log_file, std::string(ROOT_DIR) + "Log/trunk.txt", "path to trunk log file");
 
 void SigHandle(int sig) {
     faster_lio::options::FLAG_EXIT = true;
