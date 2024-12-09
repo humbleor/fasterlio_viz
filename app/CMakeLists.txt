@@ -12,16 +12,8 @@ target_link_libraries(run_mapping_newbag
         ${PROJECT_NAME}
         )
 
-# 查找 PCL 和 VTK 包
-find_package(X11 REQUIRED)
-
-# 包含头文件目录
-include_directories(
-    ${X11_INCLUDE_DIR}
-)
-
 # 添加编译源文件
 add_executable(run_mapping_viz run_mapping_viz.cc)
 target_link_libraries(run_mapping_viz
-        ${PROJECT_NAME} gflags
+        ${PROJECT_NAME}
         )
